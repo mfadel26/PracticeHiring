@@ -62,10 +62,9 @@ module.exports = {
     const name = req.query.name
     const skill = req.query.skill
     const sortParam = req.query.sortParam
-    const sortChoose = req.query.sortChoose
     const limit = req.query.limit
     const offset = req.query.offset
-    userModel.searchNS(name, skill, sortParam, sortChoose, limit, offset)
+    userModel.searchNS(name, skill, limit, offset, sortParam )
     .then(result => {
       res.json(result)
     })
@@ -73,19 +72,19 @@ module.exports = {
       console.log(err)
     })
 
-  },
-  pageUser : (req, res) => {
-    const limit = req.query.limit
-    const offset = req.query.offset
-    userModel.pageUser(limit, offset)
-    .then(result => {
-      res.json(result)
-    })
-    .catch(err => {
-      console.log(err)
-    })
+  // },
+  //  pageUser : (req, res) => {
+  //    const limit = req.query.limit
+  //    const offset = req.query.offset
+  //    userModel.pageUser(limit, offset)
+  //    .then(result => {
+  //      res.json(result)
+  //    })
+  //   .catch(err => {
+  //     console.log(err)
+  //    })
 
-  },
+   },
   deleteUser: (req, res) => {
     const userid = req.params.userid
 

@@ -2,6 +2,8 @@ require('dotenv/config')
 const uuid = require('uuid/v4')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const userModel = require('../models/reg')
+
 module.exports = {
   response: (res, status, data) => {
     const result = {}
@@ -9,43 +11,65 @@ module.exports = {
     result.result = data
     return res.status(result.status).json(result)
   },
-  validateLogin: (reqData, passData) => {
-    if (passData.length != 0) {
+  validateLogin:  (reqData, passData) => {
+    
+    // return console.log(passData)
+    
+     if (passData != undefined) {
       const reqPass = reqData.password
       const sqlPass = passData[0].password
-      if (bcrypt.compareSync(reqPass, sqlPass)) {
-        const pyload = {
-          password: reqPass,
-          uuid: uuid()
+      const dbjwt = passData[0].jwt
+      const email = reqData.email
+
+      if(!dbjwt) {
+        if (bcrypt.compareSync(reqPass, sqlPass)) {
+
+          const pyload = {
+            eml: reqData.email,
+            uuid: uuid()
+          }
+          const token = jwt.sign(pyload, process.env.KEYS, { expiresIn: '24h' })
+          userModel.patchJwtById(token, email)
+          return token
         }
-        const load = uuid
-        const token = jwt.sign({ load }, process.env.KEYS)
-        return (token)
+      
       } else {
-        return 'salah pass'
+        return dbjwt
       }
     } else {
-      return 'salah username'
+      return "check your password"
     }
-  },
-  verifyToken: (req, res, next) => {
-    const token = req.headers.abc
-    console.log(token)
+  },     
+
+  verifyToken: async (req, res, next) => {
+    //for key jwt
+    const token = req.headers.token
 
     if (!token) {
-      return res.status(401).send('Token doesnt exist')
-    }
+      return res.status(200).send('login dulu')
+    } 
+
     try {
-      jwt.verify(token, process.env.KEYS, (err, decode) => {
-        if (err) {
-          return res.status(401).send(err.name)
-        } else {
-          next()
-        }
-      })
+      const decode = jwt.decode(token, { complete: true })
+      const email = decode.payload.eml
+      const tokenDb = await userModel.getJwtDB(email)
+      const tokenCheck = tokenDb[0].jwt
+
+      if (!tokenDb && !token) {
+        return res.send('Login dulu')
+      }
+      if (tokenCheck === token) {
+        jwt.verify(token, process.env.KEYS, (err, decode) => {
+          if (tokenCheck === !token) {
+            return res.status(400).send('Token doesnt exist')
+          } else {
+            next()
+          }
+        })
+      } else {
+        return res.status(400).send('Please Login to Continue your step')
+      }
     } catch (error) {
-      return res.status(401).send('lost conection' + token)
     }
   }
-
 }

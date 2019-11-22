@@ -1,4 +1,3 @@
-const pool = require('../config/db')
 const conn = require('../config/db')
 
 module.exports = {
@@ -11,6 +10,23 @@ module.exports = {
                 } else {
                   reject(new Error(err))
                 }
+              })
+            })
+          },
+          getJwtDB: (regid) => {
+            return new Promise((resolve, reject) => {
+              conn.query('SELECT jwt FROM reg WHERE email = ? LIMIT 1', regid, (err, result) => {
+                if (err) reject(new Error(err))
+                resolve(result)
+              })
+            })
+          },
+          patchJwtById: (token, email) => {
+            return new Promise((resolve, reject) => {
+              conn.query("UPDATE reg set jwt = ? WHERE email = ? ", [token, email], (err, result) => {
+                if (err) reject(new Error(err))
+                resolve(result)
+              
               })
             })
           },

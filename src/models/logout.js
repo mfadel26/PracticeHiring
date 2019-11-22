@@ -1,9 +1,9 @@
 const conn = require('../config/db')
 
 module.exports = {
-  jwtout: (regid) => {
+  jwtout: (email) => {
     return new Promise((resolve, reject) => {
-      conn.query('UPDATE reg set jwt = NULL WHERE regid = ?', regid, (err, result) => {
+      conn.query('UPDATE reg set jwt = NULL WHERE email = ?', email, (err, result) => {
         if (err) reject(err)
         resolve(result)
       })

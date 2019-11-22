@@ -48,22 +48,9 @@ module.exports = {
     })
   },
 
-  searchNS: (name, skill) => {
+  searchNS: (name, skill, limit, offset ) => {
     return new Promise((resolve, reject) => {
-      conn.query(`SELECT * FROM enginer WHERE name LIKE '%${name}%' OR skill LIKE '%${skill}%' order by name DESC` ,
-       (err, result) => {
-        if (!err) {
-          resolve(result)
-        } else {
-          reject(new Error(err))
-        }
-      })
-    })
-  
-  },
-  pageUser: (limit, offset) => {
-    return new Promise((resolve, reject) => {
-      conn.query(`SELECT * FROM enginer LIMIT ${limit} OFFSET ${offset}` ,
+      conn.query(`SELECT * FROM enginer WHERE name LIKE '%${name}%' OR skill LIKE '%${skill}%' LIMIT ${limit} OFFSET ${offset} `,
        (err, result) => {
         if (!err) {
           resolve(result)
